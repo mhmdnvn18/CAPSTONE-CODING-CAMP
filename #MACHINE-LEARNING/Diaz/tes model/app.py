@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, jsonify
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -56,38 +56,98 @@ def predict():
                              'fastingbloodsugar', 'restingrelectro', 'maxheartrate',
                              'exerciseangia', 'oldpeak', 'slope', 'noofmajorvessels']
             
-            # Check if all fields are present
+            # Check if request is JSON or form-data
+            if request.is_json:
+                data = request.json
+            else:
+                data = request.form.to_dict()  # Convert form data to dictionary
+
+            # Validate all fields
             for field in required_fields:
-                if field not in request.form:
-                    flash(f'Field {field} is missing')
-                    return render_template('index.html')
-            
-            # Convert form data to features
+                if field not in data:
+                    return jsonify({
+                        'status': 'error',
+                        'message': f'Field {field} is missing',
+                        'code': 400
+                    }), 400
+
+            # Convert data to features
             features = []
+            input_data = {}
             for field in required_fields:
                 try:
-                    value = float(request.form[field])
+                    value = float(data[field])
                     features.append(value)
+                    input_data[field] = value
                 except ValueError:
-                    flash(f'Invalid value for {field}. Please enter a number.')
-                    return render_template('index.html')
-            
+                    return jsonify({
+                        'status': 'error',
+                        'message': f'Invalid value for {field}. Please enter a number.',
+                        'code': 400
+                    }), 400
+
             # Check if model is loaded
             if model is None:
-                flash('Error: Model not loaded properly')
-                return render_template('index.html')
-            
-            # Prediksi
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Model not loaded properly',
+                    'code': 500
+                }), 500
+
+            # Make prediction
             prediction = model.predict([features])
+            prob = model.predict_proba([features])[0]
             
-            # Interpretasi hasil
-            result = "Positif Penyakit Kardiovaskular" if prediction[0] == 1 else "Negatif Penyakit Kardiovaskular"
+            # Prepare detailed response
+            prediction_result = {
+                'prediction': "Positif" if prediction[0] == 1 else "Negatif",
+                'probability': {
+                    'negative': float(prob[0]),
+                    'positive': float(prob[1])
+                }
+            }
+
+            # Prepare risk factors
+            risk_factors = []
+            if input_data['restingBP'] > 140:
+                risk_factors.append("Tekanan darah tinggi")
+            if input_data['serumcholestrol'] > 200:
+                risk_factors.append("Kolesterol tinggi")
+            if input_data['maxheartrate'] > 100:
+                risk_factors.append("Detak jantung tinggi")
+            if input_data['oldpeak'] > 2:
+                risk_factors.append("ST depression signifikan")
+            if input_data['noofmajorvessels'] >= 2:
+                risk_factors.append("Multiple vessel disease")
+
+            # Return JSON response
+            response = {
+                'status': 'success',
+                'code': 200,
+                'data': {
+                    'patient_data': input_data,
+                    'prediction': prediction_result,
+                    'risk_factors': risk_factors,
+                    'timestamp': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+            }
+
+            # If Accept header is application/json or is_json request, return JSON
+            if request.headers.get('Accept') == 'application/json' or request.is_json:
+                return jsonify(response)
             
-            return render_template('result.html', prediction=result)
-            
+            # Otherwise return HTML template
+            return render_template('result.html', 
+                                prediction=prediction_result['prediction'],
+                                input_data=input_data,
+                                risk_factors=risk_factors)
+
     except Exception as e:
-        flash(f'An error occurred: {str(e)}')
-        return render_template('index.html')
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'code': 500
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
