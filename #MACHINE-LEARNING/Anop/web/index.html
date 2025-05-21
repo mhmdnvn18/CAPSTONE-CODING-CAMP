@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Prediksi Risiko Penyakit Kardiovaskular</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    label { display: block; margin-top: 1em; }
+    input, select { width: 100px; }
+    #result { margin-top: 2em; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Prediksi Risiko Penyakit Kardiovaskular</h2>
+  <form id="predict-form">
+    <label>Usia (dalam hari): <input type="number" name="age" required></label>
+    <label>Gender:
+      <select name="gender">
+        <option value="1">Pria</option>
+        <option value="2">Wanita</option>
+      </select>
+    </label>
+    <label>Tinggi (cm): <input type="number" name="height" required></label>
+    <label>Berat (kg): <input type="number" name="weight" required></label>
+    <label>Sistolik (ap_hi): <input type="number" name="ap_hi" required></label>
+    <label>Diastolik (ap_lo): <input type="number" name="ap_lo" required></label>
+    <label>Kolesterol:
+      <select name="cholesterol">
+        <option value="1">Normal</option>
+        <option value="2">Tinggi</option>
+        <option value="3">Sangat Tinggi</option>
+      </select>
+    </label>
+    <label>Glukosa:
+      <select name="gluc">
+        <option value="1">Normal</option>
+        <option value="2">Tinggi</option>
+        <option value="3">Sangat Tinggi</option>
+      </select>
+    </label>
+    <label>Merokok:
+      <select name="smoke">
+        <option value="0">Tidak</option>
+        <option value="1">Ya</option>
+      </select>
+    </label>
+    <label>Alkohol:
+      <select name="alco">
+        <option value="0">Tidak</option>
+        <option value="1">Ya</option>
+      </select>
+    </label>
+    <label>Aktif:
+      <select name="active">
+        <option value="0">Tidak</option>
+        <option value="1">Ya</option>
+      </select>
+    </label>
+    <button type="submit">Prediksi</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    // Ganti dengan nilai mean dan std hasil StandardScaler dari Python
+    const scalerMean = [/* age_mean */, /* height_mean */, /* weight_mean */, /* ap_hi_mean */, /* ap_lo_mean */];
+    const scalerStd = [/* age_std */, /* height_std */, /* weight_std */, /* ap_hi_std */, /* ap_lo_std */];
+
+    // Urutan fitur numerik dan kategorikal harus sama dengan training
+    const numericFeatures = ['age', 'height', 'weight', 'ap_hi', 'ap_lo'];
+    const categoricalFeatures = ['gender', 'cholesterol', 'gluc', 'smoke', 'alco', 'active'];
+
+    let model;
+
+    async function loadModel() {
+      model = await tf.loadLayersModel('tfjs_model/model.json');
+    }
+
+    function preprocessInput(formData) {
+      // Ambil fitur numerik dan lakukan scaling
+      const numeric = numericFeatures.map((feat, i) => {
+        const val = parseFloat(formData.get(feat));
+        return (val - scalerMean[i]) / scalerStd[i];
+      });
+      // Ambil fitur kategorikal (tanpa scaling)
+      const categorical = categoricalFeatures.map(feat => parseFloat(formData.get(feat)));
+      // Gabungkan
+      return numeric.concat(categorical);
+    }
+
+    document.getElementById('predict-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (!model) {
+        document.getElementById('result').innerText = 'Memuat model...';
+        await loadModel();
+      }
+      // Ambil data dari form
+      const formData = new FormData(e.target);
+      // Preprocessing
+      const inputArr = preprocessInput(formData);
+      // Prediksi
+      const inputTensor = tf.tensor2d([inputArr], [1, 11]);
+      const pred = model.predict(inputTensor);
+      const prob = (await pred.data())[0];
+      const risk = prob > 0.5 ? 1 : 0;
+      document.getElementById('result').innerText =
+        `Risiko penyakit kardiovaskular: ${risk === 1 ? 'Ya' : 'Tidak'} (Probabilitas: ${prob.toFixed(3)})`;
+      inputTensor.dispose();
+      pred.dispose();
+    });
+  </script>
+  <p style="margin-top:2em;font-size:small;color:#888;">
+    <b>Catatan:</b> Pastikan file <code>model.json</code> dan <code>group1-shard1of1.bin</code> berada di folder <code>tfjs_model/</code> yang sama dengan file ini.<br>
+    Anda harus mengisi nilai mean dan std scaler sesuai hasil training Python.
+  </p>
+</body>
+</html>
