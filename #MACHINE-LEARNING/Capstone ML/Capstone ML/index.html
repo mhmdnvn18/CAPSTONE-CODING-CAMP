@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Heart Disease Prediction</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script defer src="script.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    form { margin-bottom: 20px; }
+    label { display: block; margin-top: 10px; }
+    input { margin-bottom: 5px; }
+    #result { font-size: 1.2em; margin-top: 20px; }
+  </style>
+  <script>
+    let model;
+    async function loadModel() {
+      model = await tf.loadLayersModel('model_l2_tfjs/model.json');
+    }
+    loadModel();
+
+    document.getElementById('predict-form').onsubmit = async function(e) {
+      e.preventDefault();
+      // Ambil nilai input sesuai urutan fitur model Anda
+      const form = e.target;
+      const inputData = [
+        parseFloat(form.age.value),
+        parseFloat(form.gender.value),
+        parseFloat(form.chestpain.value),
+        parseFloat(form.restingBP.value),
+        parseFloat(form.serumcholestrol.value),
+        parseFloat(form.fastingbloodsugar.value),
+        parseFloat(form.restingrelectro.value),
+        parseFloat(form.maxheartrate.value),
+        parseFloat(form.exerciseangia.value),
+        parseFloat(form.oldpeak.value),
+        parseFloat(form.slope.value),
+        parseFloat(form.nummajorvessels.value)
+      ];
+      const inputTensor = tf.tensor2d([inputData]);
+      const prediction = model.predict(inputTensor);
+      const result = (await prediction.data())[0];
+      document.getElementById('result').innerText =
+        result > 0.5 ? 'Berisiko Penyakit Jantung' : 'Tidak Berisiko Penyakit Jantung';
+    };
+  </script>
+</head>
+<body>
+  <h2>Heart Disease Prediction</h2>
+  <form id="predict-form">
+    <label>Age: <input type="number" name="age" required></label>
+    <label>Gender (0=Female, 1=Male): <input type="number" name="gender" min="0" max="1" required></label>
+    <label>Chest Pain Type (0-3): <input type="number" name="chestpain" min="0" max="3" required></label>
+    <label>Resting Blood Pressure: <input type="number" name="restingBP" required></label>
+    <label>Serum Cholesterol: <input type="number" name="serumcholestrol" required></label>
+    <label>Fasting Blood Sugar (0/1): <input type="number" name="fastingbloodsugar" min="0" max="1" required></label>
+    <label>Resting Electrocardiographic Results (0-2): <input type="number" name="restingrelectro" min="0" max="2" required></label>
+    <label>Max Heart Rate: <input type="number" name="maxheartrate" required></label>
+    <label>Exercise Angina (0=No, 1=Yes): <input type="number" name="exerciseangia" min="0" max="1" required></label>
+    <label>Oldpeak: <input type="number" step="any" name="oldpeak" required></label>
+    <label>Slope (0-2): <input type="number" name="slope" min="0" max="2" required></label>
+    <label>Number of Major Vessels (0-3): <input type="number" name="nummajorvessels" min="0" max="3" required></label>
+    <button type="submit">Predict</button>
+  </form>
+  <div id="result"></div>
+</body>
+</html>
