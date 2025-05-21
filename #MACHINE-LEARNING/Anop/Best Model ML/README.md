@@ -1,3 +1,7 @@
+# Multi-Layer Perceptron untuk Prediksi Risiko Penyakit Kardiovaskular
+
+Model ini merupakan neural network (MLP) yang dilatih untuk memprediksi risiko penyakit kardiovaskular berdasarkan data klinis seperti usia, tekanan darah, kolesterol, dan faktor gaya hidup. Model dibangun, dievaluasi, dan dikonversi ke format TensorFlow.js agar dapat digunakan di aplikasi web.
+
 # TensorFlow.js Model Files
 
 Direktori ini berisi file model hasil konversi dari Keras/TensorFlow ke format TensorFlow.js, yang dapat digunakan untuk melakukan inferensi machine learning di lingkungan JavaScript (browser atau Node.js).
