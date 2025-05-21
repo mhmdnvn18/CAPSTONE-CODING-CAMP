@@ -63,8 +63,8 @@
 
   <script>
     // Ganti dengan nilai mean dan std hasil StandardScaler dari Python
-    const scalerMean = [/* age_mean */, /* height_mean */, /* weight_mean */, /* ap_hi_mean */, /* ap_lo_mean */];
-    const scalerStd = [/* age_std */, /* height_std */, /* weight_std */, /* ap_hi_std */, /* ap_lo_std */];
+    const scalerMean = [18393.45, 164.21, 73.89, 128.57, 96.65]; // Contoh nilai mean, ganti dengan hasil scaler.mean_
+    const scalerStd = [6338.12, 8.21, 13.42, 22.34, 18.76];      // Contoh nilai std, ganti dengan hasil scaler.scale_
 
     // Urutan fitur numerik dan kategorikal harus sama dengan training
     const numericFeatures = ['age', 'height', 'weight', 'ap_hi', 'ap_lo'];
@@ -73,7 +73,17 @@
     let model;
 
     async function loadModel() {
-      model = await tf.loadLayersModel('tfjs_model/model.json');
+      try {
+        // Path relatif dari web/index.html ke tfjs_model/model.json
+        // Jika tfjs_model ada di dalam folder web, gunakan path berikut:
+        model = await tf.loadLayersModel('./tfjs_model/model.json');
+        console.log("Model loaded successfully");
+      } catch (err) {
+        console.error("Failed to load model:", err);
+        document.getElementById('result').innerText =
+          'Gagal memuat model! Pastikan model diekspor dari Python dengan layer Input yang benar. ' +
+          'Lihat catatan di bawah.';
+      }
     }
 
     function preprocessInput(formData) {
@@ -93,6 +103,7 @@
       if (!model) {
         document.getElementById('result').innerText = 'Memuat model...';
         await loadModel();
+        if (!model) return; // Stop jika gagal load
       }
       // Ambil data dari form
       const formData = new FormData(e.target);
@@ -111,7 +122,16 @@
   </script>
   <p style="margin-top:2em;font-size:small;color:#888;">
     <b>Catatan:</b> Pastikan file <code>model.json</code> dan <code>group1-shard1of1.bin</code> berada di folder <code>tfjs_model/</code> yang sama dengan file ini.<br>
-    Anda harus mengisi nilai mean dan std scaler sesuai hasil training Python.
+    Anda harus mengisi nilai mean dan std scaler sesuai hasil training Python.<br>
+    <b>Jika terjadi error "An InputLayer should be passed either a batchInputShape or an inputShape":</b><br>
+    Pastikan model di Python dibuat dengan layer pertama seperti berikut sebelum disimpan dan dikonversi ke TensorFlow.js:<br>
+    <code>
+      model = tf.keras.Sequential([<br>
+      &nbsp;&nbsp;tf.keras.layers.Input(shape=(11,)),<br>
+      &nbsp;&nbsp;...<br>
+      ])<br>
+    </code>
+    Kemudian ekspor ke TensorFlow.js menggunakan <code>tensorflowjs_converter</code>.
   </p>
 </body>
 </html>
