@@ -6,8 +6,7 @@ export async function loadModel() {
   if (!model) {
     try {
       // Coba memuat model dari file JSON
-      model = await tf.loadLayersModel('/model/model.json');
-      
+      model = await tf.loadLayersModel('../../model/model.json');
       // Verifikasi bahwa model memiliki inputShape yang benar
       if (!model.inputs[0].shape || model.inputs[0].shape.length < 2) {
         console.warn('Model tidak memiliki inputShape yang valid, membuat model baru dengan inputShape yang benar');

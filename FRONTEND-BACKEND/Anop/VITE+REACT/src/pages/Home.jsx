@@ -6,9 +6,9 @@ import { fetchSupabaseData } from '../services/api';
 function Home() {
   const [result, setResult] = useState(null);
 
-  React.useEffect(() => {
-    fetchSupabaseData().then(console.log).catch(console.error);
-  }, []);
+  // React.useEffect(() => {
+  //   fetchSupabaseData().then(console.log).catch(console.error);
+  // }, []);
 
   return (
     <div className="min-vh-100 d-flex flex-column align-items-center justify-content-center bg-light px-2">
