@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PredictionForm from '../components/PredictionForm';
 import PredictionResult from '../components/PredictionResult';
 import { fetchSupabaseData } from '../services/api';
-
 function Home() {
   const [result, setResult] = useState(null);
 
