@@ -1,69 +1,150 @@
 # VITE + REACT Capstone Project
 
+> **Catatan:**  
+> Anda dapat menggunakan berbagai framework/library front-end modern bersama Vite, seperti React, Vue.js, Svelte, SolidJS, Angular, dan Preact. Pilih sesuai preferensi dan kebutuhan tim/proyek.
+>
+> **Vite** adalah build tool (alat pengembangan & bundler) yang sangat cepat dan fleksibel, digunakan untuk menjalankan dan membangun proyek front-end modern.  
+> **React** adalah library JavaScript untuk membangun antarmuka pengguna (UI).  
+> Vite dan React saling melengkapi: Vite untuk tooling/build, React untuk UI.  
+>
+> **Tailwind CSS** dapat digunakan bersama framework apa pun (React, Vue, Svelte, SolidJS, bahkan HTML/JS biasa).
+>
+> ### Daftar Framework, Bundler, dan Library Populer
+>
+> **Framework Front-End:**
+> - [React](https://react.dev/)
+> - [Vue.js](https://vuejs.org/)
+> - [Svelte](https://svelte.dev/)
+> - [SolidJS](https://www.solidjs.com/)
+> - [Angular](https://angular.io/)
+> - [Preact](https://preactjs.com/)
+>
+> **Framework JavaScript Lain & SSG/SSR:**
+> - [Next.js](https://nextjs.org/) (React, SSR/SSG)
+> - [Nuxt.js](https://nuxt.com/) (Vue, SSR/SSG)
+> - [Remix](https://remix.run/) (React, fullstack)
+> - [Gatsby](https://www.gatsbyjs.com/) (React, static site)
+> - [Astro](https://astro.build/) (multi-framework)
+> - [Qwik](https://qwik.builder.io/) (resumable)
+> - [Eleventy (11ty)](https://www.11ty.dev/) (static site)
+>
+> **Module Bundler/Build Tool:**
+> - [Vite](https://vitejs.dev/)
+> - [Webpack](https://webpack.js.org/)
+> - [Parcel](https://parceljs.org/)
+> - [Rollup](https://rollupjs.org/)
+> - [Snowpack](https://www.snowpack.dev/)
+>
+> **Library UI/Komponen:**
+> - [Tailwind CSS](https://tailwindcss.com/)
+> - [Chakra UI](https://chakra-ui.com/)
+> - [Material UI](https://mui.com/)
+> - [Ant Design](https://ant.design/)
+> - [Bootstrap](https://getbootstrap.com/)
+>
+> **Library HTTP/Networking:**
+> - [Axios](https://axios-http.com/)
+> - [ky](https://github.com/sindresorhus/ky)
+> - [SWR](https://swr.vercel.app/)
+> - [React Query](https://tanstack.com/query/latest)
+> - Native `fetch` API
+
 ## Fitur Utama
 
 ### 1. Responsive Layout Web Apps
-Membuat aplikasi web yang tata letaknya dapat menyesuaikan diri secara otomatis dengan berbagai ukuran layar perangkat (desktop, tablet, dan ponsel).  
-*Ensures a good user experience on all devices.*
+Membuat aplikasi web yang tata letaknya responsif di berbagai ukuran layar (desktop, tablet, ponsel).
 
 **Saran implementasi:**
-- Gunakan CSS Flexbox dan CSS Grid untuk layout yang fleksibel.
-- Terapkan media queries di CSS untuk menyesuaikan tampilan pada berbagai ukuran layar.
-- Manfaatkan framework UI responsif seperti [Tailwind CSS](https://tailwindcss.com/), [Chakra UI](https://chakra-ui.com/), atau [Material UI](https://mui.com/).
-- Uji tampilan di berbagai perangkat dan gunakan DevTools untuk simulasi responsif.
+- Gunakan CSS Flexbox/Grid.
+- Terapkan media queries.
+- Manfaatkan framework UI responsif seperti Tailwind CSS, Chakra UI, Material UI.
+- Uji tampilan di berbagai perangkat.
 
 ### 2. Networking Calls to Interact with API
-Mengimplementasikan panggilan jaringan (HTTP request) dari sisi front-end untuk berkomunikasi dengan API proyek.  
-*API provides data and functionality needed by the front-end.*
+Mengimplementasikan HTTP request dari front-end ke API.
 
 **Saran implementasi:**
-- Gunakan library seperti [Axios](https://axios-http.com/) atau `fetch` bawaan JavaScript untuk melakukan HTTP request.
-- Buat service/helper khusus untuk memisahkan logic pemanggilan API dari komponen.
-- Manfaatkan fitur async/await untuk penanganan asynchronous.
-- Tangani error dan loading state dengan baik di UI.
+- Gunakan library seperti Axios atau `fetch`.
+- Pisahkan logic API ke service/helper.
+- Gunakan async/await.
+- Tangani error dan loading state.
+
+**Contoh penggunaan fetch:**
+```js
+fetch('https://api.example.com/data')
+  .then(response => {
+    if (!response.ok) throw new Error('Network response was not ok');
+    return response.json();
+  })
+  .then(data => {
+    console.log('Data dari API:', data);
+  })
+  .catch(error => {
+    console.error('Terjadi error:', error);
+  });
+```
 
 ### 3. Module Bundler: Vite
-Menggunakan [Vite](https://vitejs.dev/) sebagai module bundler utama untuk mengelola dan menggabungkan berbagai modul kode (JavaScript, CSS, gambar, dll.) menjadi file yang siap dijalankan di browser.  
-*Vite membantu mengoptimalkan dan mengatur proyek dengan build yang sangat cepat dan pengalaman pengembangan modern.*
+Menggunakan Vite sebagai module bundler utama.
+
+**Saran implementasi:**
+- Inisialisasi dengan `npm create vite@latest`.
+- Konfigurasikan sesuai kebutuhan.
+- Manfaatkan fitur HMR.
+- Optimalkan build production.
 
 ### 4. Building RESTful API with Supabase
-Membangun API di sisi back-end yang mengikuti prinsip REST (Representational State Transfer) menggunakan [Supabase](https://supabase.com/) sebagai backend utama (database, authentication, dan RESTful API).  
-*Digunakan oleh aplikasi front-end untuk request dan pengiriman data. Integrasi Supabase ke aplikasi React menggunakan library resmi Supabase.*
+Membangun API back-end RESTful menggunakan Supabase (database, authentication, RESTful API).
+
+**Saran implementasi:**
+- Buat project dan tabel di Supabase.
+- Gunakan Supabase Client Library.
+- Manfaatkan fitur authentication.
+- Dokumentasikan endpoint dan struktur data.
 
 ### 5. Data Persistence with Supabase
-API RESTful yang dibangun menyimpan data menggunakan Supabase sebagai database utama.  
-*Semua data aplikasi dikelola dan disimpan di Supabase.*
+RESTful API menyimpan data di Supabase.
+
+**Saran implementasi:**
+- Rancang skema tabel.
+- Gunakan row-level security (RLS).
+- Backup data berkala.
+- Pantau performa database.
 
 ### 6. RESTful API URL Conventions
-Merancang URL untuk API RESTful sesuai konvensi standar (misal: menggunakan kata benda jamak seperti `/users` bukan `/user`).  
-*Makes the API easier to understand, use, and maintain.*
+Gunakan konvensi URL standar RESTful (kata benda jamak, metode HTTP sesuai).
 
 **Saran implementasi:**
-- Ikuti standar RESTful: gunakan kata benda jamak untuk resource (`/posts`, `/comments`).
-- Gunakan metode HTTP yang sesuai: GET (ambil data), POST (buat data), PUT/PATCH (update data), DELETE (hapus data).
-- Hindari penggunaan kata kerja pada URL.
-- Dokumentasikan endpoint dan konvensi URL di README atau API docs.
+- Gunakan resource jamak (`/posts`, `/comments`).
+- GET, POST, PUT/PATCH, DELETE sesuai kebutuhan.
+- Hindari kata kerja di URL.
+- Dokumentasikan endpoint.
 
 ### 7. AI/ML Integration
-Mengintegrasikan kemampuan AI/ML sebagai fitur utama aplikasi, baik di back-end maupun langsung di perangkat pengguna (browser).  
-*Main feature leverages AI/ML capabilities.*
+Integrasi AI/ML sebagai fitur utama (di browser atau back-end).
 
 **Saran implementasi:**
-- Untuk AI/ML di browser, gunakan library seperti [TensorFlow.js](https://www.tensorflow.org/js) atau [ONNX.js](https://github.com/microsoft/onnxjs).
-- Untuk AI/ML di back-end, manfaatkan Supabase Edge Functions atau integrasi dengan layanan AI eksternal (misal: OpenAI API).
-- Pastikan model yang digunakan ringan jika dijalankan di browser.
-- Sediakan fallback atau notifikasi jika perangkat tidak mendukung fitur AI/ML.
+- Untuk browser: TensorFlow.js, ONNX.js.
+- Untuk back-end: Supabase Edge Functions, layanan eksternal (OpenAI API).
+- Pastikan model ringan untuk browser.
+- Sediakan fallback/notifikasi jika tidak didukung.
 
 ### 8. Stability and Reliability
-Memastikan semua fitur utama telah diimplementasikan dengan benar dan stabil, tanpa menyebabkan aplikasi crash atau error.  
-*Ensures robust and reliable application.*
+Pastikan semua fitur stabil dan tidak menyebabkan crash/error.
 
 **Saran implementasi:**
-- Tambahkan error boundary di React untuk menangani error pada komponen.
-- Lakukan validasi input pada front-end dan back-end.
-- Buat pengujian (unit test dan integration test) untuk fitur utama.
-- Monitor aplikasi setelah deployment menggunakan tools seperti Vercel Analytics atau Sentry.
+- Tambahkan error boundary di React.
+- Validasi input di front-end & back-end.
+- Buat unit/integration test.
+- Monitor aplikasi setelah deployment.
 
 ### 9. Deployment with Vercel
-Aplikasi front-end dideploy ke [Vercel](https://vercel.com/) sebagai platform hosting utama.  
-*Push kode ke GitHub, lalu hubungkan repository ke Vercel untuk proses deployment otomatis.*
+Deploy front-end ke Vercel.
+
+**Saran implementasi:**
+- Pastikan konfigurasi (`vercel.json` jika perlu) sudah benar.
+- Atur environment variable di Vercel.
+- Build & preview sebelum production deploy.
+- Manfaatkan custom domain & analytics Vercel.
+
+---
