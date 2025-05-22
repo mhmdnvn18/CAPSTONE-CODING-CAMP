@@ -136,3 +136,44 @@ Website ini dibuat untuk mendeteksi dini penyakit kardiovaskular dengan ketentua
 Silakan pilih stack yang sesuai dengan kebutuhan tim dan keahlian yang dimiliki.
 
 ---
+
+
+> ### Daftar Framework, Bundler, dan Library Populer
+>
+> **Framework Front-End:**
+> - [React](https://react.dev/)
+> - [Vue.js](https://vuejs.org/)
+> - [Svelte](https://svelte.dev/)
+> - [SolidJS](https://www.solidjs.com/)
+> - [Angular](https://angular.io/)
+> - [Preact](https://preactjs.com/)
+>
+> **Framework JavaScript Lain & SSG/SSR:**
+> - [Next.js](https://nextjs.org/) (React, SSR/SSG)
+> - [Nuxt.js](https://nuxt.com/) (Vue, SSR/SSG)
+> - [Remix](https://remix.run/) (React, fullstack)
+> - [Gatsby](https://www.gatsbyjs.com/) (React, static site)
+> - [Astro](https://astro.build/) (multi-framework)
+> - [Qwik](https://qwik.builder.io/) (resumable)
+> - [Eleventy (11ty)](https://www.11ty.dev/) (static site)
+>
+> **Module Bundler/Build Tool:**
+> - [Vite](https://vitejs.dev/)
+> - [Webpack](https://webpack.js.org/)
+> - [Parcel](https://parceljs.org/)
+> - [Rollup](https://rollupjs.org/)
+> - [Snowpack](https://www.snowpack.dev/)
+>
+> **Library UI/Komponen:**
+> - [Tailwind CSS](https://tailwindcss.com/)
+> - [Chakra UI](https://chakra-ui.com/)
+> - [Material UI](https://mui.com/)
+> - [Ant Design](https://ant.design/)
+> - [Bootstrap](https://getbootstrap.com/)
+>
+> **Library HTTP/Networking:**
+> - [Axios](https://axios-http.com/)
+> - [ky](https://github.com/sindresorhus/ky)
+> - [SWR](https://swr.vercel.app/)
+> - [React Query](https://tanstack.com/query/latest)
+> - Native `fetch` API

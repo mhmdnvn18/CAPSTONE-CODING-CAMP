@@ -8,46 +8,8 @@
 > Vite dan React saling melengkapi: Vite untuk tooling/build, React untuk UI.  
 >
 > **Tailwind CSS** dapat digunakan bersama framework apa pun (React, Vue, Svelte, SolidJS, bahkan HTML/JS biasa).
->
-> ### Daftar Framework, Bundler, dan Library Populer
->
-> **Framework Front-End:**
-> - [React](https://react.dev/)
-> - [Vue.js](https://vuejs.org/)
-> - [Svelte](https://svelte.dev/)
-> - [SolidJS](https://www.solidjs.com/)
-> - [Angular](https://angular.io/)
-> - [Preact](https://preactjs.com/)
->
-> **Framework JavaScript Lain & SSG/SSR:**
-> - [Next.js](https://nextjs.org/) (React, SSR/SSG)
-> - [Nuxt.js](https://nuxt.com/) (Vue, SSR/SSG)
-> - [Remix](https://remix.run/) (React, fullstack)
-> - [Gatsby](https://www.gatsbyjs.com/) (React, static site)
-> - [Astro](https://astro.build/) (multi-framework)
-> - [Qwik](https://qwik.builder.io/) (resumable)
-> - [Eleventy (11ty)](https://www.11ty.dev/) (static site)
->
-> **Module Bundler/Build Tool:**
-> - [Vite](https://vitejs.dev/)
-> - [Webpack](https://webpack.js.org/)
-> - [Parcel](https://parceljs.org/)
-> - [Rollup](https://rollupjs.org/)
-> - [Snowpack](https://www.snowpack.dev/)
->
-> **Library UI/Komponen:**
-> - [Tailwind CSS](https://tailwindcss.com/)
-> - [Chakra UI](https://chakra-ui.com/)
-> - [Material UI](https://mui.com/)
-> - [Ant Design](https://ant.design/)
-> - [Bootstrap](https://getbootstrap.com/)
->
-> **Library HTTP/Networking:**
-> - [Axios](https://axios-http.com/)
-> - [ky](https://github.com/sindresorhus/ky)
-> - [SWR](https://swr.vercel.app/)
-> - [React Query](https://tanstack.com/query/latest)
-> - Native `fetch` API
+
+---
 
 ## Fitur Utama
 
@@ -148,3 +110,92 @@ Deploy front-end ke Vercel.
 - Manfaatkan custom domain & analytics Vercel.
 
 ---
+
+## Cara Instalasi & Menjalankan Proyek
+
+1. Clone repository ini.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Jalankan aplikasi:
+   ```bash
+   npm run dev
+   ```
+4. Konfigurasikan environment variable jika diperlukan (misal: koneksi Supabase).
+
+---
+
+## Struktur Folder
+
+```
+Anop/
+└── VITE+REACT/
+    ├── public/
+    │   └── model/
+    │       ├── model.json
+    │       └── group1-shard1of1.bin
+    └── src/
+        ├── components/
+        │   ├── ErrorBoundary.jsx
+        │   ├── PredictionForm.jsx
+        │   └── PredictionResult.jsx
+        ├── pages/
+        │   └── Home.jsx
+        ├── services/
+        │   ├── api.js
+        │   ├── supabase.js
+        │   └── model.js
+        ├── utils/
+        │   └── validateInput.js
+        ├── App.jsx
+        ├── main.jsx
+        └── index.css
+```
+
+- **public/model/**: Tempat file model TensorFlow.js hasil training (`model.json`, `group1-shard1of1.bin`).
+- **src/components/**: Komponen UI utama (form, hasil, error boundary).
+- **src/pages/**: Halaman utama aplikasi.
+- **src/services/**: Logic API, integrasi Supabase, dan pemanggilan model AI/ML.
+- **src/utils/**: Utility/helper seperti validasi input.
+- **src/App.jsx, src/main.jsx**: Entry point aplikasi React.
+- **src/index.css**: Konfigurasi Tailwind CSS.
+
+---
+
+## Contoh Penggunaan Fitur Prediksi
+
+```js
+// Contoh pemanggilan API prediksi penyakit kardiovaskular
+fetch('/api/predict', {
+  method: 'POST',
+  body: JSON.stringify({ usia: 45, tekanan_darah: 130, ... }),
+  headers: { 'Content-Type': 'application/json' }
+})
+  .then(res => res.json())
+  .then(data => console.log('Hasil prediksi:', data));
+```
+
+> **Library AI/ML:**
+> - [TensorFlow.js](https://www.tensorflow.org/js/)
+> - [ONNX.js](https://github.com/microsoft/onnxjs)
+> - [ml5.js](https://ml5js.org/)
+> - [Brain.js](https://brain.js.org/)
+
+---
+
+### 10. Testing
+
+Melakukan pengujian untuk memastikan aplikasi berjalan sesuai harapan.
+
+**Saran implementasi:**
+- Gunakan library testing seperti Jest, React Testing Library, atau Cypress.
+- Buat test untuk komponen, halaman, dan fungsi penting.
+- Lakukan pengujian secara berkala, terutama setelah ada perubahan kode.
+
+---
+
+## Lisensi
+
+MIT License
+
