@@ -1,47 +1,49 @@
 import React from 'react';
 
 function PredictionResult({ result }) {
-  // Interpretasi hasil (misal: threshold 0.5)
-  let status = '';
-  let color = '';
-  let icon = '';
-  if (typeof result === 'number') {
-    if (result >= 0.5) {
-      status = 'Risiko Tinggi';
-      color = 'border-danger bg-danger-subtle text-danger';
-      icon = (
-        <i className="fa-solid fa-triangle-exclamation text-danger fs-1 mb-2"></i>
-      );
-    } else {
-      status = 'Risiko Rendah';
-      color = 'border-success bg-success-subtle text-success';
-      icon = (
-        <i className="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
-      );
-    }
-  }
+  if (!result) return null;
+
+  console.log('Result in PredictionResult:', result); // Debug log
+  
+  const isHighRisk = result.risk === 'high';
+  const colorClass = isHighRisk ? 'danger' : 'success';
+  const riskText = isHighRisk ? 'Risiko Tinggi' : 'Risiko Rendah';
+  const percentage = typeof result.percentage === 'number' ? 
+    result.percentage.toFixed(1) : 
+    (result.probability * 100).toFixed(1);
 
   return (
-    <div className={`mt-4 rounded-4 shadow-lg w-100 max-w-600 mx-auto p-4 border ${color} d-flex flex-column align-items-center`}>
-      <h2 className="fw-bold mb-3 fs-4 text-primary d-flex align-items-center gap-2">
-        <i className="fa-solid fa-chart-line text-primary"></i>
-        Hasil Prediksi
-      </h2>
-      <div className="d-flex flex-column align-items-center">
-        {typeof result === 'number' ? (
-          <>
-            {icon}
-            <div className="fs-3 fw-bold px-4 py-2 rounded mb-2">{status}</div>
-            <div className="text-secondary mb-2">
-              Skor Risiko: <span className="font-monospace">{result.toFixed(3)}</span>
-            </div>
-            <div className="mt-2 small text-muted text-center">
-              * Hasil prediksi ini bersifat estimasi, konsultasikan ke dokter untuk diagnosis pasti.
-            </div>
-          </>
-        ) : (
-          <div>{typeof result === 'object' ? JSON.stringify(result) : result}</div>
+    <div className={`mt-4 rounded-4 shadow-lg p-4 border border-${colorClass}`}>
+      <h2 className="text-center fs-4 mb-4">Hasil Prediksi</h2>
+      
+      <div className="text-center">
+        <div className={`display-6 text-${colorClass} mb-3`}>
+          {riskText}
+        </div>
+        
+        <div className="fs-4 mb-3">
+          <span className="text-secondary">Probabilitas: </span>
+          <strong className={`text-${colorClass}`}>{percentage}%</strong>
+        </div>
+
+        {result.riskFactors && result.riskFactors.length > 0 && (
+          <div className="mt-4 text-start">
+            <h3 className="fs-5 mb-3">Faktor Risiko Terdeteksi:</h3>
+            <ul className="list-unstyled">
+              {result.riskFactors.map((factor, idx) => (
+                <li key={idx} className="mb-2">
+                  <i className="fa-solid fa-triangle-exclamation text-warning me-2"></i>
+                  {factor}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
+      </div>
+      
+      <div className="mt-4 text-center small text-muted">
+        <i className="fa-solid fa-info-circle me-1"></i>
+        Hasil ini hanya prediksi. Silakan konsultasikan dengan dokter untuk diagnosis yang akurat.
       </div>
     </div>
   );

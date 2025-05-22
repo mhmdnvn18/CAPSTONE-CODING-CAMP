@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { validateInput } from '../utils/validateInput';
 import { predict } from '../services/model';
+import { yearsToDays } from '../utils/convertAge';
 
 const initialState = {
-  usia: '',
-  tekanan_darah: '',
-  kolesterol: '',
-  jenis_kelamin: '',
-  merokok: '',
-  diabetes: '',
-  berat_badan: '',
-  tinggi_badan: '',
-  aktivitas_fisik: '',
-  riwayat_keluarga: '',
-  diet: ''
+  age: '',             // Age in days
+  height: '',          // Height in cm
+  weight: '',          // Weight in kg
+  gender: '',          // Gender (categorical)
+  systolic: '',        // Systolic blood pressure
+  diastolic: '',       // Diastolic blood pressure
+  cholesterol: '',     // 1: normal, 2: above normal, 3: well above normal
+  glucose: '',         // 1: normal, 2: above normal, 3: well above normal
+  smoking: '',         // binary
+  alcohol: '',         // binary
+  activity: '',        // binary
+  cardio: ''          // Target variable (binary)
 };
 
 function PredictionForm({ onResult }) {
@@ -28,182 +30,182 @@ function PredictionForm({ onResult }) {
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
-    const valid = validateInput(input);
+    
+    const inputWithDays = {
+        ...input,
+        age: yearsToDays(Number(input.age))
+    };
+    
+    const valid = validateInput(inputWithDays);
     if (!valid.ok) {
-      setError(valid.msg);
-      return;
+        setError(valid.msg);
+        return;
     }
+    
     setLoading(true);
     try {
-      const result = await predict(input);
-      onResult(result);
+        const result = await predict(input);
+        console.log('Prediction result:', result);
+        
+        // Save to localStorage and redirect
+        localStorage.setItem('predictionResult', JSON.stringify({
+            ...result,
+            timestamp: new Date().toISOString()
+        }));
+        
+        window.location.href = '/result.html';
     } catch (err) {
-      setError(err.message || 'Gagal melakukan prediksi.');
+        console.error('Prediction error:', err);
+        setError(err.message || 'Gagal melakukan prediksi.');
     }
     setLoading(false);
   };
 
+  // Helper function to generate risk factors based on input
+  function generateRiskFactors(input) {
+    const factors = [];
+    
+    if (input.systolic > 140) factors.push("Tekanan darah sistolik tinggi");
+    if (input.diastolic > 90) factors.push("Tekanan darah diastolik tinggi");
+    if (input.cholesterol === '3') factors.push("Kolesterol sangat tinggi");
+    if (input.glucose === '3') factors.push("Glukosa sangat tinggi");
+    if (input.smoking === '1') factors.push("Merokok");
+    if (input.alcohol === '1') factors.push("Konsumsi alkohol");
+    if (input.activity === '0') factors.push("Kurang aktivitas fisik");
+    
+    return factors;
+  }
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white rounded-4 shadow-lg w-100 max-w-600 p-4 row g-3 border border-primary"
-    >
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Usia (tahun)</label>
-        <input
-          type="number"
-          name="usia"
-          value={input.usia}
-          onChange={handleChange}
-          className="form-control"
-          min={1}
-          required
-          placeholder="Contoh: 45"
-        />
+    <form onSubmit={handleSubmit} className="bg-white rounded-4 shadow-lg p-4 border border-primary">
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Usia (tahun)</label>
+          <input
+            type="number"
+            name="age"
+            value={input.age}
+            onChange={handleChange}
+            className="form-control"
+            required
+            min="1"
+            max="120"
+            placeholder="Masukkan usia dalam tahun"
+          />
+        </div>
+        
+        <div className="col-md-6">
+          <label className="form-label">Tinggi Badan (cm)</label>
+          <input
+            type="number"
+            name="height"
+            value={input.height}
+            onChange={handleChange}
+            className="form-control"
+            required
+            min="1"
+          />
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Berat Badan (kg)</label>
+          <input
+            type="number"
+            name="weight"
+            value={input.weight}
+            onChange={handleChange}
+            className="form-control"
+            required
+            step="0.1"
+            min="1"
+          />
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Jenis Kelamin</label>
+          <select name="gender" value={input.gender} onChange={handleChange} className="form-select" required>
+            <option value="">Pilih</option>
+            <option value="1">Laki-laki</option>
+            <option value="0">Perempuan</option>
+          </select>
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Tekanan Darah Sistolik (mmHg)</label>
+          <input
+            type="number"
+            name="systolic"
+            value={input.systolic}
+            onChange={handleChange}
+            className="form-control"
+            required
+          />
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Tekanan Darah Diastolik (mmHg)</label>
+          <input
+            type="number"
+            name="diastolic"
+            value={input.diastolic}
+            onChange={handleChange}
+            className="form-control"
+            required
+          />
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Level Kolesterol</label>
+          <select name="cholesterol" value={input.cholesterol} onChange={handleChange} className="form-select" required>
+            <option value="">Pilih</option>
+            <option value="1">Normal</option>
+            <option value="2">Di atas normal</option>
+            <option value="3">Jauh di atas normal</option>
+          </select>
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Level Glukosa</label>
+          <select name="glucose" value={input.glucose} onChange={handleChange} className="form-select" required>
+            <option value="">Pilih</option>
+            <option value="1">Normal</option>
+            <option value="2">Di atas normal</option>
+            <option value="3">Jauh di atas normal</option>
+          </select>
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Merokok</label>
+          <select name="smoking" value={input.smoking} onChange={handleChange} className="form-select" required>
+            <option value="">Pilih</option>
+            <option value="1">Ya</option>
+            <option value="0">Tidak</option>
+          </select>
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Konsumsi Alkohol</label>
+          <select name="alcohol" value={input.alcohol} onChange={handleChange} className="form-select" required>
+            <option value="">Pilih</option>
+            <option value="1">Ya</option>
+            <option value="0">Tidak</option>
+          </select>
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Aktivitas Fisik</label>
+          <select name="activity" value={input.activity} onChange={handleChange} className="form-select" required>
+            <option value="">Pilih</option>
+            <option value="1">Aktif</option>
+            <option value="0">Tidak aktif</option>
+          </select>
+        </div>
       </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Tekanan Darah (mmHg)</label>
-        <input
-          type="number"
-          name="tekanan_darah"
-          value={input.tekanan_darah}
-          onChange={handleChange}
-          className="form-control"
-          min={1}
-          required
-          placeholder="Contoh: 120"
-        />
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Kolesterol (mg/dL)</label>
-        <input
-          type="number"
-          name="kolesterol"
-          value={input.kolesterol}
-          onChange={handleChange}
-          className="form-control"
-          min={1}
-          required
-          placeholder="Contoh: 200"
-        />
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Jenis Kelamin</label>
-        <select
-          name="jenis_kelamin"
-          value={input.jenis_kelamin}
-          onChange={handleChange}
-          className="form-select"
-          required
-        >
-          <option value="">Pilih</option>
-          <option value="0">Pria</option>
-          <option value="1">Wanita</option>
-        </select>
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Merokok</label>
-        <select
-          name="merokok"
-          value={input.merokok}
-          onChange={handleChange}
-          className="form-select"
-          required
-        >
-          <option value="">Pilih</option>
-          <option value="1">Ya</option>
-          <option value="0">Tidak</option>
-        </select>
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Diabetes</label>
-        <select
-          name="diabetes"
-          value={input.diabetes}
-          onChange={handleChange}
-          className="form-select"
-          required
-        >
-          <option value="">Pilih</option>
-          <option value="1">Ya</option>
-          <option value="0">Tidak</option>
-        </select>
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Berat Badan (kg)</label>
-        <input
-          type="number"
-          name="berat_badan"
-          value={input.berat_badan}
-          onChange={handleChange}
-          className="form-control"
-          min={1}
-          required
-          placeholder="Contoh: 70"
-        />
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Tinggi Badan (cm)</label>
-        <input
-          type="number"
-          name="tinggi_badan"
-          value={input.tinggi_badan}
-          onChange={handleChange}
-          className="form-control"
-          min={1}
-          required
-          placeholder="Contoh: 170"
-        />
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Aktivitas Fisik</label>
-        <select
-          name="aktivitas_fisik"
-          value={input.aktivitas_fisik}
-          onChange={handleChange}
-          className="form-select"
-          required
-        >
-          <option value="">Pilih</option>
-          <option value="1">Cukup</option>
-          <option value="0">Kurang</option>
-        </select>
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Riwayat Keluarga</label>
-        <select
-          name="riwayat_keluarga"
-          value={input.riwayat_keluarga}
-          onChange={handleChange}
-          className="form-select"
-          required
-        >
-          <option value="">Pilih</option>
-          <option value="1">Ada</option>
-          <option value="0">Tidak Ada</option>
-        </select>
-      </div>
-      <div className="col-md-6">
-        <label className="form-label fw-semibold text-primary">Diet Tidak Sehat</label>
-        <select
-          name="diet"
-          value={input.diet}
-          onChange={handleChange}
-          className="form-select"
-          required
-        >
-          <option value="">Pilih</option>
-          <option value="1">Ya</option>
-          <option value="0">Tidak</option>
-        </select>
-      </div>
-      <div className="col-12 d-flex flex-column align-items-center mt-2">
-        {error && <div className="text-danger mb-2">{error}</div>}
-        <button
-          type="submit"
-          className="btn btn-primary btn-lg px-5 fw-bold"
-          disabled={loading}
-        >
+      
+      {error && <div className="alert alert-danger mt-3">{error}</div>}
+      
+      <div className="text-center mt-4">
+        <button type="submit" className="btn btn-primary btn-lg px-5" disabled={loading}>
           {loading ? 'Memproses...' : 'Prediksi'}
         </button>
       </div>
